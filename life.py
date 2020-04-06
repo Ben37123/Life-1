@@ -55,6 +55,8 @@ class Life(object):
                 self.get_geometry()
             elif command == 'change-rules':
                 self.change_rules(parameter)
+            elif command == 'library':
+                self.from_library(parameter, './library/')
             self.get_menu()
             self.__menu = 'main'
             command, parameter = self.get_command()
@@ -67,7 +69,7 @@ class Life(object):
         if self.__menu == 'main':
             print("N[E]w  [N]ext  [R]un  [F]illrate  [J]ump  [S]ize  [J]ump  Sa[V]e  L[O]ad  [M]ore  [H]elp  [Q]uit")
         if self.__menu == 'more':
-            print("[D]elay  [G]raphics  R[U]les  Sa[V]e  L[O]ad  [W]orldType  [B]ack  [H]elp  [Q]uit")
+            print("[D]elay  [G]raphics  R[U]les  Sa[V]e  L[O]ad  [W]orldType  [L]ibrary  [B]ack  [H]elp  [Q]uit")
 
     def get_command(self):
         """
@@ -91,7 +93,8 @@ class Life(object):
                     'm': 'more',
                     'b': 'back',
                     'w': 'world-type',
-                    'q': 'quit'}
+                    'q': 'quit',
+                    'l': 'library'}
 
         validCommands = commands.keys()
 
@@ -479,6 +482,46 @@ class Life(object):
             self.__world = self.__worldType.from_file(filename, self.__worldType)
         print(self.__world)
 
+    def from_library(self, filename, myPath='./'):
+        Cell.set_display('basic')
+        files = []
+        number = 1
+        print('**************************************')
+        for file in os.listdir(myPath):
+            print(f'{number}: {file}')
+            files.append(file)
+            number += 1
+        print('**************************************')
+        prompt = 'Which file would you like to open? '
+        fileNumber = toolbox.get_integer_between(1, number - 1, prompt)
+        filename = files[fileNumber - 1]
+        print(filename)
+        #
+        # Check for and add the correct file extension.
+        #
+        if filename[-5:] != '.life':
+            filename = filename + '.life'
+        allFiles = os.listdir(myPath)
+        if filename not in allFiles:
+            print('404: File not found...')
+            for filenames in allFiles:
+                print(filenames)
+            print('Try one of these next time.')
+            print()
+        else:
+            #
+            # Add on the correct path for saving files if the user didn't
+            # include it in the filename.
+            #
+            if filename[0:len(myPath)] != myPath:
+                filename = myPath + filename
+            self.__world = World.from_file(filename, self.__worldType)
+            print(self.__world, end='')
+            print()
+            print(f'You now opened {filename} world.')
+            print()
+        self.show_status()
+
     def get_geometry(self):
         """
         Changes the type of world from a world with boundaries or a wrap around world
@@ -535,12 +578,11 @@ class Life(object):
         Rules.set_rules(setString)
         self.display()
 
+
+
 if __name__ =='__main__':
     simulation = Life()
     simulation.main()
-
-
-
 
 
 
