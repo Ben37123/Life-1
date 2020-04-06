@@ -246,6 +246,3 @@ class World(object):
             if currentGen == pastGeneration:
                 stop = True
         return stop
-
-
-        
